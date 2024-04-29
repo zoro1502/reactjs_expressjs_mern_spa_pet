@@ -1,0 +1,152 @@
+.container {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  margin-right: auto;
+}
+.background-image {
+  width: 100%;
+  height: auto;
+  z-index: -1;
+  padding-bottom: 100px;
+  position: sticky;
+  display: flex;
+  justify-content: center;
+  background-image: url("https://bizweb.dktcdn.net/100/458/454/themes/869149/assets/slider_3.jpg?1694535318764");
+  background-repeat: no-repeat;
+  z-index: 1;
+  background-size: cover;
+}
+.bg-ab{
+  position: absolute;
+  background-color: #7b7a7a62;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+}
+.section1 {
+  display: block;
+  z-index: 1;
+}
+.section-2 {
+  display: block;
+  z-index: 0;
+}
+.container-item {
+  width: 100%;
+  height: 100%;
+}
+.slider {
+  z-index: -1;
+  display: flex;
+  -webkit-box-pack: end !important;
+  -ms-flex-pack: end !important;
+  justify-content: flex-end;
+}
+.service-container {
+  display: flex;
+  width: 100%;
+  height: 450px;
+  position: relative;
+}
+
+/*  about */
+
+.about-container {
+  width: 100%;
+  height: auto;
+  display: flex;
+}
+.div-image {
+  display: flex;
+  justify-content: flex-end;
+  float: right;
+  width: 50%;
+  height: 100%;
+}
+.image-about {
+  width: 540px;
+  height: 650px;
+  object-fit: cover;
+}
+.text-about {
+  width: 50%;
+  height: 100%;
+}
+.text-about-mb {
+  width: 70%;
+  padding: 48px 15px 48px 48px;
+}
+.h2-about {
+  opacity: 0.7;
+  font-size: 40px;
+  font-family: var(--family-header);
+}
+.text-about-mb p {
+  color: #666666;
+}
+/* video  */
+.video {
+  width: 100%;
+  height: 300px;
+}
+
+/* pricing */
+.pricing-container {
+  padding: 40px 15px;
+  text-align: center;
+  background-color: rgb(235, 232, 222);
+}
+
+.pricing-item {
+  height: auto;
+  width: 100%;
+
+  padding-bottom: 40px;
+  display: flex;
+}
+
+.list-shop {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.list-shop .shop {
+  height: 300px;
+  border: 1px solid gray;
+  padding: 10px;
+  background-color: #fff;
+}
+
+.list-shop .shop img {
+  height: 200px;
+  width: 250px;
+  object-fit: cover;
+}
+.list-shop .shop .info {
+  display: flex;
+  justify-content: space-between;
+}
+
+.list-shop .shop .info h2 {
+  color: crimson;
+}
+
+.list-shop .shop .info h3{
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: left;
+}
+
+.list-shop .shop .info p{
+  width: 200px;
+  font-size: 12px;
+  text-align: left;
+}
