@@ -42,6 +42,7 @@ export default function TableUser({ title, row, column, setRowId }) {
           bottom: params.isLastVisible ? 0 : 5,
         })}
         onCellEditCommit={(params) => setRowId(params.id)}
+		autosizeOptions
       />
     </Box>
   );

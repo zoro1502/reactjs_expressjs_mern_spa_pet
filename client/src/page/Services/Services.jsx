@@ -10,136 +10,170 @@ import { useState, useEffect } from "react";
 import Scroll from "../../components/ScrollToTop/Scroll";
 import FindService from "../../components/Find/FindService";
 
-export default function Services() {
-  const [hairCut, setHairCut] = useState([]);
-  const [beard, setBeard] = useState([]);
-  const [curling, setCurling] = useState([]);
-  const [dye, setDye] = useState([]);
-  const [takeEar, setTakeEar] = useState([]);
-  const [shampoo, setShampoo] = useState([]);
-  const [shave, setShave] = useState([]);
-  const [hairCare, setHairCare] = useState([]);
+export default function Services ()
+{
+	const [ hairCut, setHairCut ] = useState( [] );
+	const [ service, setService ] = useState( [] );
+	const [ beard, setBeard ] = useState( [] );
+	const [ curling, setCurling ] = useState( [] );
+	const [ dye, setDye ] = useState( [] );
+	const [ takeEar, setTakeEar ] = useState( [] );
+	const [ shampoo, setShampoo ] = useState( [] );
+	const [ shave, setShave ] = useState( [] );
+	const [ hairCare, setHairCare ] = useState( [] );
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const res = await axios.get(
-  //       "http://localhost:8800/api/service/category?Category=CẮT TÓC"
-  //     );
-  //     setHairCut(res.data.value);
-  //   };
-  //   fetchData();
-  // }, []);
+	// useEffect(() => {
+	//   const fetchData = async () => {
+	//     const res = await axios.get(
+	//       "http://localhost:8800/api/service/category?Category=CẮT TÓC"
+	//     );
+	//     setHairCut(res.data.value);
+	//   };
+	//   fetchData();
+	// }, []);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const res = await axios.get(
-  //       "http://localhost:8800/api/service/category?Category=Beard Trim"
-  //     );
-  //     setBeard(res.data.value);
-  //   };
-  //   fetchData();
-  // }, []);
+	// useEffect(() => {
+	//   const fetchData = async () => {
+	//     const res = await axios.get(
+	//       "http://localhost:8800/api/service/category?Category=Beard Trim"
+	//     );
+	//     setBeard(res.data.value);
+	//   };
+	//   fetchData();
+	// }, []);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const res = await axios.get(
-  //       "http://localhost:8800/api/service/category?Category=Curling hair"
-  //     );
-  //     setCurling(res.data.value);
-  //   };
-  //   fetchData();
-  // }, []);
+	// useEffect(() => {
+	//   const fetchData = async () => {
+	//     const res = await axios.get(
+	//       "http://localhost:8800/api/service/category?Category=Curling hair"
+	//     );
+	//     setCurling(res.data.value);
+	//   };
+	//   fetchData();
+	// }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await axios.get(
-        "http://localhost:8800/api/service/all"
-      );
-      setHairCut(res.data.value);
-    };
-    fetchData();
-  }, []);
+	useEffect( () =>
+	{
+		const fetchData = async () =>
+		{
+			const res = await axios.get(
+				"http://localhost:8800/api/service/all"
+			);
+			setService(res?.data?.value || [])
+			const data = groupData( res?.data?.value || [] );
+			console.log( 'Service-----------> ', data );
+			setHairCut( data );
+		};
+		fetchData();
+	}, [] );
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const res = await axios.get(
-  //       "http://localhost:8800/api/service/category?Category=Shave"
-  //     );
-  //     setShave(res.data.value);
-  //   };
-  //   fetchData();
-  // }, []);
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const res = await axios.get(
-  //       "http://localhost:8800/api/service/category?Category=Shampoo"
-  //     );
-  //     setShampoo(res.data.value);
-  //   };
-  //   fetchData();
-  // }, []);
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const res = await axios.get(
-  //       "http://localhost:8800/api/service/category?Category=Take Earwax"
-  //     );
-  //     setTakeEar(res.data.value);
-  //   };
-  //   fetchData();
-  // }, []);
+	const groupData = ( data ) =>
+	{
+		return data.reduce( ( newItem, item, index ) =>
+		{
+			let obj = {
+				category: item.Category,
+				serviceData: [ item ]
+			};
+			let i = newItem.findIndex( e => e.category == obj.category );
+			if ( i >= 0 )
+			{
+				newItem[ i ].serviceData.push( item )
+			} else
+			{
+				newItem.push( obj );
+			}
+			return newItem;
+		}, [] );
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const res = await axios.get(
-  //       "http://localhost:8800/api/service/category?Category=Hair Care"
-  //     );
-  //     setHairCare(res.data.value);
-  //   };
-  //   fetchData();
-  // }, []);
+	}
 
-  return (
-    <div className="container">
-      <section className="section1">
-        <div className="background-image">
-          <div className="container-item">
-            <TopBar />
-            <SliderServices title="Service" />
-          </div>
-        </div>
-        <div className="telephone">
-          <Telephone />
-        </div>
-        <FindService />
-      </section>
-      <div className="services-container">
-        {
-          hairCut?.map((item, index) => (
-            <div className="category" key={index}>
-            <div className="title-category">
-                <h3>{item?.Category}</h3>
-            </div>
-            <div className="div-service">
-             
-                <Category
-                  image={item?.Image}
-                  name={item?.Name_Service}
-                  description={item?.Description}
-                  price={item?.Price}
-                />
-          
-            </div>
-          </div>
-          ))
-       }
-      
-      </div>
+	// useEffect(() => {
+	//   const fetchData = async () => {
+	//     const res = await axios.get(
+	//       "http://localhost:8800/api/service/category?Category=Shave"
+	//     );
+	//     setShave(res.data.value);
+	//   };
+	//   fetchData();
+	// }, []);
+	// useEffect(() => {
+	//   const fetchData = async () => {
+	//     const res = await axios.get(
+	//       "http://localhost:8800/api/service/category?Category=Shampoo"
+	//     );
+	//     setShampoo(res.data.value);
+	//   };
+	//   fetchData();
+	// }, []);
+	// useEffect(() => {
+	//   const fetchData = async () => {
+	//     const res = await axios.get(
+	//       "http://localhost:8800/api/service/category?Category=Take Earwax"
+	//     );
+	//     setTakeEar(res.data.value);
+	//   };
+	//   fetchData();
+	// }, []);
 
-      <div className="telephone">
-        <Telephone />
-      </div>
-      <Scroll />
-      <Footer />
-    </div>
-  );
+	// useEffect(() => {
+	//   const fetchData = async () => {
+	//     const res = await axios.get(
+	//       "http://localhost:8800/api/service/category?Category=Hair Care"
+	//     );
+	//     setHairCare(res.data.value);
+	//   };
+	//   fetchData();
+	// }, []);
+
+	return (
+		<div className="container">
+			<section className="section1">
+				<div className="background-image">
+					<div className="container-item">
+						<TopBar />
+						<SliderServices title="Service" />
+					</div>
+				</div>
+				<div className="telephone">
+					<Telephone />
+				</div>
+				<FindService data={service} show={true}/>
+			</section>
+			<div className="services-container">
+				{
+					hairCut?.map( ( item, index ) => (
+						<div className="category  mx-0" key={ index }>
+							<div className="title-category">
+								<h3>{ item?.category }</h3>
+							</div>
+							<div className="row">
+
+								{ item?.serviceData?.length > 0 && item?.serviceData.map( ( e, index ) =>
+								{
+									return <div className="col-md-6 col-12" key={ index }>
+										<Category
+											
+											image={ e?.Image }
+											name={ e?.Name_Service }
+											description={ e?.Description }
+											price={ e?.Price }
+										/>
+									</div>
+								} ) }
+
+							</div>
+						</div>
+					) )
+				}
+
+			</div>
+
+			<div className="telephone">
+				<Telephone />
+			</div>
+			<Scroll />
+			<Footer />
+		</div>
+	);
 }

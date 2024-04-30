@@ -256,3 +256,6 @@
   transition: all 0.3s ease-in-out;
   border-radius: 4px;
 }
+.text-danger {
+	color: red;
+}

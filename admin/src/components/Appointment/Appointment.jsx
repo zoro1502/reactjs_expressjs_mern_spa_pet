@@ -15,426 +15,496 @@ import moment from "moment";
 import "../../styles/components/find.css";
 import { BsSearch, BsPersonPlus, BsTelephonePlus } from "react-icons/bs";
 import { HiOutlineMail } from "react-icons/hi";
+import { MdPets, MdCalendarToday } from "react-icons/md";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import { Link } from "react-router-dom";
 
-export default function Appointment() {
-  const { user: currentUser } = useContext(AuthContext);
-  const [staff, setStaff] = useState([]);
-  const [service, setService] = useState([]);
-  const [slotArray, setSlotArray] = useState([]);
-  const [date, setDate] = useState(moment().format("yyyy-MM-DD"));
-  const [openService, setOpenService] = useState(false);
-  const [nameService, setNameService] = useState("");
-  const [staffId, setStaffId] = useState("");
-  const [slotId, setSlotId] = useState("");
-  const [check, setCheck] = useState(-1);
-  const [dateId, setDateId] = useState("");
-  const [step1, setStep1] = useState(false);
-  const [step2, setStep2] = useState(false);
-  const [step3, setStep3] = useState(false);
-  const [step4, setStep4] = useState(false);
-  const [id, setId] = useState("");
-  const [name, setName] = useState("");
-  const [telephone, setTelephone] = useState("");
-  const [email, setEmail] = useState("");
-  const [checkData, setCheckData] = useState(false);
+export default function Appointment ()
+{
+	const { user: currentUser } = useContext( AuthContext );
+	const [ staff, setStaff ] = useState( [] );
+	const [ service, setService ] = useState( [] );
+	const [ slotArray, setSlotArray ] = useState( [] );
+	const [ date, setDate ] = useState( moment().format( "yyyy-MM-DD" ) );
+	const [ openService, setOpenService ] = useState( false );
+	const [ nameService, setNameService ] = useState( "" );
+	const [ staffId, setStaffId ] = useState( "" );
+	const [ slotId, setSlotId ] = useState( "" );
+	const [ check, setCheck ] = useState( -1 );
+	const [ dateId, setDateId ] = useState( "" );
+	const [ step1, setStep1 ] = useState( false );
+	const [ step2, setStep2 ] = useState( false );
+	const [ step3, setStep3 ] = useState( false );
+	const [ step4, setStep4 ] = useState( false );
+	const [ id, setId ] = useState( "" );
+	const [ name, setName ] = useState( "" );
+	const [ telephone, setTelephone ] = useState( "" );
+	const [ email, setEmail ] = useState( "" );
+	const [ checkData, setCheckData ] = useState( false );
 
-  const currentTime = new Date();
-  useEffect(() => {
-    const fetchStaff = async () => {
-      const res = await axios.get("http://localhost:8800/api/staff/all");
-      setStaff(res.data.value);
-    };
-    fetchStaff();
-    // fetService
+	const currentTime = new Date();
+	useEffect( () =>
+	{
+		const fetchStaff = async () =>
+		{
+			const res = await axios.get( "http://localhost:8800/api/staff/all" );
+			setStaff( res.data.value );
+		};
+		fetchStaff();
+		// fetService
 
-    const fetchService = async () => {
-      const res = await axios.get("http://localhost:8800/api/service/all");
-      setService(res.data.value);
-    };
-    fetchService();
-  }, []);
+		const fetchService = async () =>
+		{
+			const res = await axios.get( "http://localhost:8800/api/service/all" );
 
-  const handleServices = async (name) => {
-    setNameService(name);
-    setOpenService(false);
-    setStep1(true);
-  };
+			let data = res?.data?.value?.map( ( item, index ) =>
+			{
+				item.is_chosen = false;
+				return item;
+			} )
+			setService( data );
+		};
+		fetchService();
+	}, [] );
 
-  const handleStaff = async (e) => {
-    setStep2(true);
-    setStaffId(e.target.value);
-  };
-  const handleSlot = async (slotid, index) => {
-    setSlotId(slotid);
-    setStep4(true);
-    setCheck(index);
-  };
+	const handleServices = async ( i ) =>
+	{
+		let dataService = service.map( ( item, index ) =>
+		{
+			if ( item?._id == i )
+			{
+				item.is_chosen = !item.is_chosen
+			}
+			return item;
+		} );
+		console.log( i );
+		let dataChosen = dataService.filter( item => item.is_chosen )?.map( item => item?.Name_Service );
+		console.log( 'handleServices-------> dataService: ', dataService );
+		console.log( 'handleServices-------> dataChosen: ', dataChosen );
+		if ( dataChosen?.length > 0 )
+		{
+			setNameService( dataChosen?.join( ', ' ) );
+			setStep1( true );
+		}
+	};
 
-  const FindCustomer = () => {
-    const [data, setData] = useState([]);
-    const [filteredData, setFilteredData] = useState([]);
-    const [wordEntered, setWordEntered] = useState("");
+	const handleStaff = async ( e ) =>
+	{
+		setStep2( true );
+		setStaffId( e.target.value );
+		if(date != '') {
+			const data = {
+				staffId: e.target.value,
+				date: date,
+			};
+			await getSlotsByFilter(data);
+		}
+	};
+	const handleSlot = async ( slotid, index ) =>
+	{
+		setSlotId( slotid );
+		setStep4( true );
+		setCheck( index );
+	};
 
-    useEffect(() => {
-      const loadData = async () => {
-        const res = await axios.get("http://localhost:8800/api/customer/all");
-        setData(res.data.value);
-      };
-      loadData();
-    }, []);
+	const FindCustomer = () =>
+	{
+		const [ data, setData ] = useState( [] );
+		const [ filteredData, setFilteredData ] = useState( [] );
+		const [ wordEntered, setWordEntered ] = useState( "" );
 
-    const handleFilter = async (e) => {
-      const searchWord = e.target.value;
-      setWordEntered(searchWord);
-      const newFilter = data.filter((value) => {
-        return value.Name_Customer.toLowerCase().includes(
-          searchWord.toLowerCase()
-        );
-      });
-      if (searchWord === "") {
-        setFilteredData([]);
-      } else {
-        setFilteredData(newFilter);
-      }
-    };
+		useEffect( () =>
+		{
+			const loadData = async () =>
+			{
+				const res = await axios.get( "http://localhost:8800/api/customer/all" );
+				setData( res.data.value );
+			};
+			loadData();
+		}, [] );
 
-    const ChooseHandler = async (id, name, tel, email) => {
-      setId(id);
-      setName(name);
-      setTelephone(tel);
-      setEmail(email);
-      setWordEntered("");
-      setFilteredData([]);
-      setCheckData(true);
-    };
+		const handleFilter = async ( e ) =>
+		{
+			const searchWord = e.target.value;
+			setWordEntered( searchWord );
+			const newFilter = data.filter( ( value ) =>
+			{
+				return value.Name_Customer.toLowerCase().includes(
+					searchWord.toLowerCase()
+				);
+			} );
+			if ( searchWord === "" )
+			{
+				setFilteredData( [] );
+			} else
+			{
+				setFilteredData( newFilter );
+			}
+		};
 
-    return (
-      <div className="find-container">
-        <div className="close-booking">
-          <Link
-            to={`/booking`}
-            style={{ textDecoration: "none", color: "black" }}
-          >
-            <IoIosCloseCircleOutline />
-          </Link>
-        </div>
-        <div className="header-find">Find the customer </div>
-        <div className="item-find">
-          <span>
-            <BsSearch />
-          </span>
-          <input
-            type="text"
-            className="input-find"
-            placeholder="Search customer"
-            value={wordEntered}
-            onChange={handleFilter}
-          />
-          {filteredData.length !== 0 ? (
-            <>
-              <span
-                onClick={() => {
-                  setWordEntered("");
-                  setFilteredData([]);
-                }}
-              >
-                <AiOutlineCloseCircle />
-              </span>
-            </>
-          ) : null}
-        </div>
-        {filteredData.length !== 0 && (
-          <div className="dataResult">
-            {filteredData.map((value, index) => {
-              return (
-                <div
-                  className="info-customer"
-                  key={index}
-                  onClick={() => {
-                    ChooseHandler(
-                      value._id,
-                      value.Name_Customer,
-                      value.Telephone,
-                      value.Email
-                    );
-                  }}
-                >
-                  <img className="img-search" src={value.Image[0]} alt="" />
-                  <p className="data">{value.Name_Customer} </p>
-                </div>
-              );
-            })}
-          </div>
-        )}
-        <div className="container-info-appointment">
-          <div className="header-receipt"> Info customer</div>
-          <div className="item-find">
-            <span>
-              <BsPersonPlus />
-            </span>
-            <input type="text" className="input-find" defaultValue={name} />
-          </div>
-          <div className="item-find">
-            <span>
-              <BsTelephonePlus />
-            </span>
-            <input
-              type="text"
-              className="input-find"
-              defaultValue={telephone}
-            />
-          </div>
-          <div className="item-find">
-            <span>
-              <HiOutlineMail />
-            </span>
-            <input type="text" className="input-find" defaultValue={email} />
-          </div>
-        </div>
-      </div>
-    );
-  };
+		const ChooseHandler = async ( id, name, tel, email ) =>
+		{
+			setId( id );
+			setName( name );
+			setTelephone( tel );
+			setEmail( email );
+			setWordEntered( "" );
+			setFilteredData( [] );
+			setCheckData( true );
+		};
 
-  const DateHandle = async (e) => {
-    const newDate = moment(new Date(e.target.value)).format("YYYY-MM-DD");
-    setDate(newDate);
-    setStep3(true);
-    const data = {
-      staffId: staffId,
-      date: newDate,
-    };
+		return (
+			<div className="find-container">
+				<div className="close-booking">
+					<Link
+						to={ `/booking` }
+						style={ { textDecoration: "none", color: "black" } }
+					>
+						<IoIosCloseCircleOutline />
+					</Link>
+				</div>
+				<div className="header-find">Find the customer </div>
+				<div className="item-find">
+					<span>
+						<BsSearch />
+					</span>
+					<input
+						type="text"
+						className="input-find"
+						placeholder="Search customer"
+						value={ wordEntered }
+						onChange={ handleFilter }
+					/>
+					{ filteredData.length !== 0 ? (
+						<>
+							<span
+								onClick={ () =>
+								{
+									setWordEntered( "" );
+									setFilteredData( [] );
+								} }
+							>
+								<AiOutlineCloseCircle />
+							</span>
+						</>
+					) : null }
+				</div>
+				{ filteredData.length !== 0 && (
+					<div className="dataResult">
+						{ filteredData.map( ( value, index ) =>
+						{
+							return (
+								<div
+									className="info-customer"
+									key={ index }
+									onClick={ () =>
+									{
+										ChooseHandler(
+											value._id,
+											value.Name_Customer,
+											value.Telephone,
+											value.Email
+										);
+									} }
+								>
+									<img className="img-search" src={ value.Image[ 0 ] } alt="" />
+									<p className="data">{ value.Name_Customer } </p>
+								</div>
+							);
+						} ) }
+					</div>
+				) }
+				<div className="container-info-appointment">
+					<div className="header-receipt"> Info customer</div>
+					<div className="item-find">
+						<span>
+							<BsPersonPlus />
+						</span>
+						<input type="text" className="input-find" defaultValue={ name } />
+					</div>
+					<div className="item-find">
+						<span>
+							<BsTelephonePlus />
+						</span>
+						<input
+							type="text"
+							className="input-find"
+							defaultValue={ telephone }
+						/>
+					</div>
+					<div className="item-find">
+						<span>
+							<HiOutlineMail />
+						</span>
+						<input type="text" className="input-find" defaultValue={ email } />
+					</div>
+				</div>
+			</div>
+		);
+	};
 
-    try {
-      const res = await axios.post(
-        "http://localhost:8800/api/appointment/get-slots",
-        data
-      );
+	const DateHandle = async ( e ) =>
+	{
+		const newDate = moment( new Date( e.target.value ) ).format( "YYYY-MM-DD" );
+		setDate( newDate );
+		setStep3( true );
+		const data = {
+			staffId: staffId,
+			date: newDate,
+		};
+		await getSlotsByFilter(data);
+	};
+	const getSlotsByFilter = async (filters) => {
+		
 
-      setSlotArray(res.data.slots);
-      setDateId(res.data._id);
-    } catch (error) {}
-  };
-  const history = useNavigate();
+		try
+		{
+			console.log('filters slot---------> ', filters);
+			const res = await axios.post(
+				"http://localhost:8800/api/appointment/get-slots",
+				filters
+			);
+			console.log( 'data slot--------->', res.data );
+			setSlotArray( res.data.slots );
+			setDateId( res.data._id );
+		} catch ( error ) { }
+	}
+	const history = useNavigate();
 
-  const submitBooking = async () => {
-    const data = {
-      StaffId: staffId,
-      DateId: dateId,
-      SlotId: slotId,
-      CustomerId: id,
-      NameCustomer: name,
-      TelephoneCustomer: telephone,
-      Email: email,
-      Services: nameService,
-    };
-    try {
-      const res = await axios.post(
-        "http://localhost:8800/api/appointment/add",
-        data
-      );
+	const submitBooking = async () =>
+	{
+		const data = {
+			StaffId: staffId,
+			DateId: dateId,
+			SlotId: slotId,
+			CustomerId: id,
+			NameCustomer: name,
+			TelephoneCustomer: telephone,
+			Email: email,
+			Services: nameService,
+		};
+		try
+		{
+			const res = await axios.post(
+				"http://localhost:8800/api/appointment/add",
+				data
+			);
 
-      toast.success("Appointment successfully!!");
-      setTimeout(() => {
-        history("/booking");
-      }, 3000);
-    } catch (error) {
-      toast.error("Appointment failed");
-    }
-  };
+			toast.success( "Appointment successfully!!" );
+			setTimeout( () =>
+			{
+				history( "/booking" );
+			}, 3000 );
+		} catch ( error )
+		{
+			toast.error( "Appointment failed" );
+		}
+	};
 
-  return (
-    <div className="container">
-      <div className="left-container">
-        <Sidebar />
-      </div>
-      <div className="right-container">
-        <div className="top-container">
-          <TopBar />
-        </div>
-        <div className="bottom-container">
-          <ToastContainer />
-          <div className="appointment-container">
-            <div className="find-customer">
-              <div className="search-customer">
-                <FindCustomer />
-              </div>
-            </div>
-            {checkData ? (
-              <div className="booking-container">
-                <div className="header-booking">Make a reservation</div>
-                <div className="form-booking">
-                  <span className="title-booking"> 1.Choose Service </span>
-                  <div className="item-booking">
-                    <span className="icon-booking">
-                      <MdContentCut />
-                    </span>
-                    <div
-                      className="input-booking choose"
-                      onClick={() => {
-                        setOpenService(true);
-                      }}
-                    >
-                      {step1 ? (
-                        <span>{nameService} </span>
-                      ) : (
-                        "View all services"
-                      )}
-                    </div>
-                    <span className="icon-booking">
-                      <IoMdArrowDropright />
-                    </span>
-                  </div>
-                  {openService ? (
-                    <div className="show-service-bookings">
-                      <div className="grid-service">
-                        {service.map((services, i) => (
-                          <div key={i} className="items-service-bookings">
-                            <img
-                              src={services.Image}
-                              alt=""
-                              className="img-booking"
-                            />
-                            <span> {services.Name_Service}</span>
-                            <span> {services.Price}</span>
-                            <span className="desc-booking">
-                              {services.Description}
-                            </span>
-                            <button
-                              className="button-choose"
-                              onClick={() => {
-                                handleServices(services.Name_Service);
-                              }}
-                            >
-                              Choose
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
+	return (
+		<div className="container">
+			<div className="left-container">
+				<Sidebar />
+			</div>
+			<div className="right-container">
+				<div className="top-container">
+					<TopBar />
+				</div>
+				<div className="bottom-container">
+					<ToastContainer />
+					<div className="appointment-container">
+						<div className="find-customer">
+							<div className="search-customer">
+								<FindCustomer />
+							</div>
+						</div>
+						{ checkData ? (
+							<div className="booking-container">
+								<div className="header-booking">Make a reservation</div>
+								<div className="form-booking">
+									<span className="title-booking"> 1.Choose Service </span>
+									<div className="item-booking">
+										<span className="icon-booking">
+											<MdContentCut />
+										</span>
+										<div
+											className="input-booking choose"
+											onClick={ () =>
+											{
+												setOpenService( !openService );
+											} }
+										>
+											{ step1 ? (
+												<span>{ nameService } </span>
+											) : (
+												"View all services"
+											) }
+										</div>
+										<span className="icon-booking" onClick={ () =>
+										{
+											setOpenService( !openService );
+										} }>
+											<IoMdArrowDropright />
+										</span>
+									</div>
+									{ openService ? (
+										<div className="show-service-bookings">
+											<div className="grid-service">
+												{ service.map( ( services, i ) => (
+													<div key={ i } className="items-service-bookings">
+														<img
+															src={ services.Image }
+															alt=""
+															className="img-booking"
+														/>
+														<span> { services.Name_Service }</span>
+														<span> { services.Price }</span>
+														<span className="desc-booking">
+															{ services.Description }
+														</span>
+														<button
+															className="button-choose"
+															onClick={ () =>
+															{
+																handleServices( services._id );
+															} }
+														>
+															{ services?.is_chosen ? 'Cancel' : 'Choose' }
+														</button>
+													</div>
+												) ) }
+											</div>
+										</div>
+									) : null }
 
-                  {/*  choose staff */}
+									{/*  choose staff */ }
 
-                  <span className="title-booking"> 2.Choose Staff </span>
-                  <div className="item-booking">
-                    <span className="icon-booking">
-                      <BsPersonFill />
-                    </span>
-                    <select
-                      type="text"
-                      className="input-booking"
-                      placeholder="Staff"
-                      name="StaffId"
-                      onChange={handleStaff}
-                    >
-                      {staff.map((value, i) => (
-                        <option value={value._id} key={i}>
-                          {value.Name}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="icon-booking">
-                      <IoMdArrowDropright />
-                    </span>
-                  </div>
-                  <span className="title-booking"> 3.Choose Date </span>
-                  <div className="item-booking">
-                    <span className="icon-booking">
-                      <BsPersonFill />
-                    </span>
-                    <input
-                      type="date"
-                      name="Date"
-                      className="input-booking"
-                      value={moment(date).format("yyyy-MM-DD")}
-                      onChange={DateHandle}
-                    ></input>
+									<span className="title-booking"> 2.Choose Staff </span>
+									<div className="item-booking">
+										<span className="icon-booking">
+											<BsPersonFill />
+										</span>
+										<select
+											type="text"
+											className="input-booking"
+											placeholder="Staff"
+											name="StaffId"
+											onChange={ handleStaff }
+										>
+											<option value="">
+												Please choose a Staff
+											</option>
+											{ staff.map( ( value, i ) => (
+												<option value={ value._id } key={ i }>
+													{ value.Name }
+												</option>
+											) ) }
+										</select>
+										<span className="icon-booking">
+											<IoMdArrowDropright />
+										</span>
+									</div>
+									<span className="title-booking"> 3.Choose Date </span>
+									<div className="item-booking">
+										<span className="icon-booking">
+											<MdCalendarToday />
+										</span>
+										<input
+											type="date"
+											name="Date"
+											className="input-booking"
+											value={ moment( date ).format( "yyyy-MM-DD" ) }
+											onChange={ DateHandle }
+										></input>
 
-                    <span className="icon-booking">
-                      <IoMdArrowDropright />
-                    </span>
-                  </div>
+										<span className="icon-booking">
+											<IoMdArrowDropright />
+										</span>
+									</div>
 
-                  {step3 ? (
-                    <React.Fragment>
-                      <span className="title-booking">
-                        {" "}
-                        4.Choose Slot{" "}
-                        <span
-                          style={{
-                            fontSize: "16px",
-                            paddingLeft: "10px",
-                            fontWeight: "400",
-                          }}
-                        >
-                          {" "}
-                          (Please select the available time periods)
-                        </span>{" "}
-                      </span>
-                      <div className="grid-slot">
-                        {slotArray?.map((slot, index) => {
-                          const Time = new Date(date + "T" + slot.Time);
-                          if (Time < currentTime) {
-                            return (
-                              <button key={index} className="item-false">
-                                {slot.Time}
-                              </button>
-                            );
-                          }
-                          if (slot.isBooked === true) {
-                            return (
-                              <button key={index} className="item-false">
-                                {slot.Time}
-                              </button>
-                            );
-                          } else {
-                            return (
-                              <button
-                                key={index}
-                                className="slot-item"
-                                onClick={() => {
-                                  handleSlot(slot._id, index);
-                                }}
-                                style={{
-                                  backgroundColor:
-                                    check === index ? "#bf925b" : "white",
-                                  color: check === index ? "white" : "black",
-                                }}
-                              >
-                                {slot.Time}
-                              </button>
-                            );
-                          }
-                        })}
-                      </div>
-                    </React.Fragment>
-                  ) : null}
-                  {step4 ? (
-                    <React.Fragment>
-                      <button
-                        className="submit-booking true"
-                        onClick={submitBooking}
-                      >
-                        {" "}
-                        Complete
-                      </button>
-                    </React.Fragment>
-                  ) : (
-                    <React.Fragment>
-                      <button className="submit-booking false">
-                        {" "}
-                        Complete
-                      </button>
-                    </React.Fragment>
-                  )}
-                </div>
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+									{ step3 ? (
+										<React.Fragment>
+											<span className="title-booking">
+												{ " " }
+												4.Choose Slot{ " " }
+												<span className={staffId != "" ? '' : 'text-danger'}
+													style={ {
+														fontSize: "16px",
+														paddingLeft: "10px",
+														fontWeight: "400",
+													} }
+												>
+													{ " " }
+													{staffId != "" && '(Please select the available time periods)' || '(Please choose staff and date to get slots)'}
+												</span>{ " " }
+											</span>
+											<div className="grid-slot">
+												{ slotArray?.map( ( slot, index ) =>
+												{
+													const Time = new Date( date + "T" + slot.Time );
+													if ( Time < currentTime )
+													{
+														return (
+															<button key={ index } className="item-false">
+																{ slot.Time }
+															</button>
+														);
+													}
+													if ( slot.isBooked === true )
+													{
+														return (
+															<button key={ index } className="item-false">
+																{ slot.Time }
+															</button>
+														);
+													} else
+													{
+														return (
+															<button
+																key={ index }
+																className="slot-item"
+																onClick={ () =>
+																{
+																	handleSlot( slot._id, index );
+																} }
+																style={ {
+																	backgroundColor:
+																		check === index ? "#bf925b" : "white",
+																	color: check === index ? "white" : "black",
+																} }
+															>
+																{ slot.Time }
+															</button>
+														);
+													}
+												} ) }
+											</div>
+										</React.Fragment>
+									) : null }
+									{ step4 ? (
+										<React.Fragment>
+											<button
+												className="submit-booking true"
+												onClick={ submitBooking }
+											>
+												{ " " }
+												Complete
+											</button>
+										</React.Fragment>
+									) : (
+										<React.Fragment>
+											<button className="submit-booking false">
+												{ " " }
+												Complete
+											</button>
+										</React.Fragment>
+									) }
+								</div>
+							</div>
+						) : null }
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 }

@@ -4,13 +4,13 @@ import "../../styles/components/category.css";
 export default function Category({ image, name, description, price }) {
   return (
     <div className="category-items">
-      <div className="items-service">
+      <div className="items-service mx-0">
         <img src={image} alt="" />
         <div className="text-services">
           <div className="h3"> {name}</div>
           <p>{description}</p>
           <div className="price-link">
-            <span className="price"> {price}$</span>
+            <span className="price"> {price} VND</span>
             <Link to={`/services/${name}`} className="link">
               <span>See Detail</span>
             </Link>

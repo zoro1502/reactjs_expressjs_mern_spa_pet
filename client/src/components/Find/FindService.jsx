@@ -5,19 +5,23 @@ import { BsSearch } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 
-export default function FindService() {
+export default function FindService(props) {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [wordEntered, setWordEntered] = useState("");
 
   useEffect(() => {
-    const loadData = async () => {
-      const res = await axios.get("http://localhost:8800/api/service/all");
-      setData(res.data.value);
-    };
-
-    loadData();
-  }, []);
+    if(props.data?.length > 0) {
+		setData(props.data);
+	} else {
+		const loadData = async () => {
+			const res = await axios.get("http://localhost:8800/api/service/all");
+			setData(res.data.value);
+		  };
+	  
+		  loadData();
+	}
+  }, [props?.show]);
 
   const handleFilter = async (e) => {
     const searchWord = e.target.value;

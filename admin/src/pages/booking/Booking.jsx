@@ -276,6 +276,7 @@ export default function Booking() {
         headerName: "Services",
         width: 130,
         editable: true,
+		cellClassName: 'booking-service text-break ',
       },
       {
         field: "Staff",

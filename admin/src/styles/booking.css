@@ -17,3 +17,9 @@
   width: 100%;
   height: 300px;
 }
+
+.booking-service.text-break {
+	word-break: break-word !important ;
+	overflow: visible !important;
+	white-space: normal !important;
+}

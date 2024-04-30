@@ -103,14 +103,12 @@ export default function Sidebar() {
         </div>
       ) : (
         <div className="bottom-sidebar">
-          
           <NavLink to={`/store`} className="Link">
             <div className="items-sidebar">
               <MdSpaceDashboard className="icon" />
               <div className="item-sidebar">Store</div>
             </div>
           </NavLink>
-          
           <NavLink to={`/booking`} className="Link">
             <div className="items-sidebar">
               <BsJournalBookmarkFill className="icon" />
