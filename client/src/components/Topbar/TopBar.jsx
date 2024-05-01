@@ -76,6 +76,11 @@ export default function TopBar() {
               Contact
             </NavLink>
           </div>
+		  <div className="items-link">
+            <NavLink className="link" to="/about">
+              About
+            </NavLink>
+          </div>
         </div>
         <div className="login-topBar">
           <span> </span>

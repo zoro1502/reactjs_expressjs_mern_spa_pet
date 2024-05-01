@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import "../../styles/services.css";
 import TopBar from "../../components/Topbar/TopBar";
 import { SliderServices } from "../../components/Home/Slider/Slider";
@@ -9,6 +9,10 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import Scroll from "../../components/ScrollToTop/Scroll";
 import FindService from "../../components/Find/FindService";
+import { CommonContext } from "../../context/common/CommonContext";
+import Skeleton from "react-loading-skeleton";
+import CategoryLoading from "../../components/Category/CategoryLoading";
+import { timeDelay } from "../../context/helperService";
 
 export default function Services ()
 {
@@ -21,6 +25,17 @@ export default function Services ()
 	const [ shampoo, setShampoo ] = useState( [] );
 	const [ shave, setShave ] = useState( [] );
 	const [ hairCare, setHairCare ] = useState( [] );
+
+
+
+	const { showLoading, dispatch } = useContext( CommonContext );
+	const toggleShowLoading = ( value ) =>
+	{
+		dispatch( {
+			type: 'LOADING',
+			payload: value
+		} )
+	}
 
 	// useEffect(() => {
 	//   const fetchData = async () => {
@@ -56,10 +71,13 @@ export default function Services ()
 	{
 		const fetchData = async () =>
 		{
+			toggleShowLoading( true )
 			const res = await axios.get(
 				"http://localhost:8800/api/service/all"
 			);
-			setService(res?.data?.value || [])
+			await timeDelay( 1000 )
+			toggleShowLoading( false )
+			setService( res?.data?.value || [] )
 			const data = groupData( res?.data?.value || [] );
 			console.log( 'Service-----------> ', data );
 			setHairCut( data );
@@ -138,22 +156,42 @@ export default function Services ()
 				<div className="telephone">
 					<Telephone />
 				</div>
-				<FindService data={service} show={true}/>
+				<FindService data={ service } show={ true } />
 			</section>
 			<div className="services-container">
+
+				{ showLoading &&
+					<div className="category mx-0">
+						<div className="row">
+							{ [ 1, 2 ].map( ( item, index ) =>
+							{
+								return <div className="col-md-6 col-12" key={ index }>
+									<CategoryLoading />
+								</div>
+							} ) }
+						</div>
+					</div>
+
+				}
 				{
-					hairCut?.map( ( item, index ) => (
+					!showLoading && hairCut?.map( ( item, index ) => (
 						<div className="category  mx-0" key={ index }>
 							<div className="title-category">
 								<h3>{ item?.category }</h3>
 							</div>
 							<div className="row">
 
-								{ item?.serviceData?.length > 0 && item?.serviceData.map( ( e, index ) =>
+								{ showLoading && [ 1, 2 ].map( ( item, index ) =>
+								{
+									return <div className="col-md-6 col-12" key={ index }>
+										<CategoryLoading />
+									</div>
+								} ) }
+								{ !showLoading && item?.serviceData?.length > 0 && item?.serviceData.map( ( e, index ) =>
 								{
 									return <div className="col-md-6 col-12" key={ index }>
 										<Category
-											
+
 											image={ e?.Image }
 											name={ e?.Name_Service }
 											description={ e?.Description }

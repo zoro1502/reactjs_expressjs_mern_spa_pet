@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import TopBar from "../../components/Topbar/TopBar";
 import { SliderServices } from "../../components/Home/Slider/Slider";
 import Footer from "../../components/Footer/Footer";
@@ -11,6 +11,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Scroll from "../../components/ScrollToTop/Scroll";
+import { CommonContext } from "../../context/common/CommonContext";
 export default function Contact() {
   //declaration fields in form
   const [inputField, setInputField] = useState({
@@ -23,6 +24,14 @@ export default function Contact() {
     setInputField({ ...inputField, [e.target.name]: e.target.value });
   };
 
+  const { showLoading, dispatch } = useContext( CommonContext );
+	const toggleShowLoading = (value) => {
+		dispatch({
+			type: 'LOADING',
+			payload: value
+		})
+	}
+
   // handle Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,15 +43,19 @@ export default function Contact() {
       Message: inputField.Message,
     };
     try {
+		toggleShowLoading(true);
       const response = await axios.post(
         "http://localhost:8800/api/contact/add",
         customer
       );
+		toggleShowLoading(false);
+		console.log(response);
+
       if (response.data.status === 500) {
         toast.error(response.data.message);
         // toast.error(response.data.message);
       } else {
-        toast.success(response.data.message);
+        toast.success("Send contact successfully!");
         setInputField({ Name: "", Email: "", Subject: "", Message: "" });
       }
     } catch (err) {

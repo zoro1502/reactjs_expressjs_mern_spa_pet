@@ -12,6 +12,8 @@ import ModalLogin from "../../components/Modal/ModalLogin";
 import { MdPets, MdCalendarToday } from "react-icons/md";
 import moment from "moment";
 import Scroll from "../../components/ScrollToTop/Scroll";
+import LoadingPage from "../../components/common/Loading";
+import { CommonContext } from "../../context/common/CommonContext";
 
 export default function Appointment ()
 {
@@ -35,6 +37,15 @@ export default function Appointment ()
 	const [ step2, setStep2 ] = useState( false );
 	const [ step3, setStep3 ] = useState( false );
 	const [ step4, setStep4 ] = useState( false );
+	const [ isLoadingSlot, setIsLoadingSlot ] = useState( false );
+
+	const { showLoading, dispatch } = useContext( CommonContext );
+	const toggleShowLoading = (value) => {
+		dispatch({
+			type: 'LOADING',
+			payload: value
+		})
+	}
 
 	const currentTime = new Date();
 
@@ -68,23 +79,26 @@ export default function Appointment ()
 		fetchMyPet();
 	}, [] );
 
-	const handleServices = async (id ) =>
+	const handleServices = async ( id ) =>
 	{
-		let dataService = service.map((item, index) => {
-			if(item?._id == id) {
-				item.is_chosen = !item.is_chosen 
+		let dataService = service.map( ( item, index ) =>
+		{
+			if ( item?._id == id )
+			{
+				item.is_chosen = !item.is_chosen
 			}
 			return item;
-		});
-		
-		let dataChosen = dataService.filter(item => item.is_chosen)?.map(item => item?.Name_Service);
-		console.log('handleServices-------> dataService: ', dataService);
-		console.log('handleServices-------> dataChosen: ', dataChosen);
-		if(dataChosen?.length > 0 ){
-			setNameService( dataChosen?.join(', ') );
+		} );
+
+		let dataChosen = dataService.filter( item => item.is_chosen )?.map( item => item?.Name_Service );
+		console.log( 'handleServices-------> dataService: ', dataService );
+		console.log( 'handleServices-------> dataChosen: ', dataChosen );
+		if ( dataChosen?.length > 0 )
+		{
+			setNameService( dataChosen?.join( ', ' ) );
 			setStep1( true );
 		}
-		
+
 	};
 
 	const handlePetServices = async ( name ) =>
@@ -97,14 +111,15 @@ export default function Appointment ()
 	{
 		setStep2( true );
 		setStaffId( e.target.value );
-		if(date != '') {
+		if ( date != '' )
+		{
 			const data = {
 				staffId: e.target.value,
 				date: date,
 			};
-			await getSlotsByFilter(data);
+			await getSlotsByFilter( data );
 		}
-		
+
 	};
 	const handleSlot = async ( slotid, index ) =>
 	{
@@ -123,19 +138,26 @@ export default function Appointment ()
 			staffId: staffId,
 			date: newDate,
 		};
-		await getSlotsByFilter(data);
+		if ( staffId != '' && newDate != '' )
+		{
+			await getSlotsByFilter( data );
+
+		}
 	};
 
-	const getSlotsByFilter = async (filters) => {
-		
+	const getSlotsByFilter = async ( filters ) =>
+	{
+
 
 		try
 		{
-			console.log('filters slot---------> ', filters);
+			console.log( 'filters slot---------> ', filters );
+			setIsLoadingSlot( true );
 			const res = await axios.post(
 				"http://localhost:8800/api/appointment/get-slots",
 				filters
 			);
+			setIsLoadingSlot( false )
 			console.log( 'data slot--------->', res.data );
 			setSlotArray( res.data.slots );
 			setDateId( res.data._id );
@@ -159,10 +181,12 @@ export default function Appointment ()
 		console.log( 'data booking--------> ', data );
 		try
 		{
+			toggleShowLoading(true)
 			const res = await axios.post(
 				"http://localhost:8800/api/appointment/add",
 				data
 			);
+			toggleShowLoading(false)
 			console.log( res );
 
 			toast.success( "Appointment successfully!!" );
@@ -178,6 +202,7 @@ export default function Appointment ()
 
 	return (
 		<div className="container">
+
 			<section className="section1">
 				<div className="background-image">
 					<div className="container-item">
@@ -205,15 +230,15 @@ export default function Appointment ()
 									className="input-booking choose"
 									onClick={ () =>
 									{
-										setOpenService( !openService	 );
+										setOpenService( !openService );
 									} }
 								>
 									{ step1 ? <span>{ nameService } </span> : "View all services" }
 								</div>
 								<span className="icon-booking" onClick={ () =>
-									{
-										setOpenService( !openService );
-									} }>
+								{
+									setOpenService( !openService );
+								} }>
 									<IoMdArrowDropright />
 								</span>
 							</div>
@@ -235,7 +260,7 @@ export default function Appointment ()
 												<button
 													onClick={ () =>
 													{
-														handleServices(services?._id );
+														handleServices( services?._id );
 													} }
 												>
 													{ " " }
@@ -263,9 +288,9 @@ export default function Appointment ()
 									{ <span>{ namePetService || 'View all pets' } </span> }
 								</div>
 								<span className="icon-booking" onClick={ () =>
-									{
-										setOpenPetService( !openPetService );
-									} }>
+								{
+									setOpenPetService( !openPetService );
+								} }>
 									<IoMdArrowDropright />
 								</span>
 							</div>
@@ -329,7 +354,7 @@ export default function Appointment ()
 							<span className="title-booking"> 3.Choose Date </span>
 							<div className="item-booking">
 								<span className="icon-booking">
-									<MdCalendarToday   />
+									<MdCalendarToday />
 								</span>
 								<input
 									type="date"
@@ -343,66 +368,70 @@ export default function Appointment ()
 									<IoMdArrowDropright />
 								</span> */}
 							</div>
-
-							{ step3 ? (
-								<React.Fragment>
-									<span className="title-booking">
-										{ " " }
-										4.Choose Slot{ " " }
-										<span className={staffId != "" ? '' : 'text-danger'}
-											style={ {
-												fontSize: "16px",
-												paddingLeft: "10px",
-												fontWeight: "400",
-											} }
-										>
-											{ " " }
-											{staffId != "" && '(Please select the available time periods)' || '(Please choose staff and date to get slots)'}
-										</span>{ " " }
-									</span>
-									<div className="grid-slot">
-										{ slotArray?.map( ( slot, index ) =>
-										{
-											const Time = new Date( date + "T" + slot.Time );
-											if ( Time < currentTime )
-											{
-												return (
-													<button key={ index } className="item-false">
-														{ slot.Time }
-													</button>
-												);
-											}
-											if ( slot.isBooked === true )
-											{
-												return (
-													<button key={ index } className="item-false">
-														{ slot.Time }
-													</button>
-												);
-											} else
-											{
-												return (
-													<button
-														key={ index }
-														className="slot-item"
-														onClick={ () =>
-														{
-															handleSlot( slot._id, index );
-														} }
-														style={ {
-															backgroundColor:
-																check === index ? "#bf925b" : "white",
-															color: check === index ? "white" : "black",
-														} }
-													>
-														{ slot.Time }
-													</button>
-												);
-											}
-										} ) }
-									</div>
-								</React.Fragment>
-							) : null }
+							{ step3 && <>
+								{
+									isLoadingSlot ? <LoadingPage className="mt-5 text-center" showLoading={ true } /> : (
+										<>
+											<span className="title-booking">
+												{ " " }
+												4.Choose Slot{ " " }
+												<span className={ staffId != "" ? '' : 'text-danger' }
+													style={ {
+														fontSize: "16px",
+														paddingLeft: "10px",
+														fontWeight: "400",
+													} }
+												>
+													{ " " }
+													{ staffId != "" && '(Please select the available time periods)' || '(Please choose staff and date to get slots)' }
+												</span>{ " " }
+											</span>
+											<div className="grid-slot">
+												{ slotArray?.map( ( slot, index ) =>
+												{
+													const Time = new Date( date + "T" + slot.Time );
+													if ( Time < currentTime )
+													{
+														return (
+															<button key={ index } className="item-false">
+																{ slot.Time }
+															</button>
+														);
+													}
+													if ( slot.isBooked === true )
+													{
+														return (
+															<button key={ index } className="item-false">
+																{ slot.Time }
+															</button>
+														);
+													} else
+													{
+														return (
+															<button
+																key={ index }
+																className="slot-item"
+																onClick={ () =>
+																{
+																	handleSlot( slot._id, index );
+																} }
+																style={ {
+																	backgroundColor:
+																		check === index ? "#bf925b" : "white",
+																	color: check === index ? "white" : "black",
+																} }
+															>
+																{ slot.Time }
+															</button>
+														);
+													}
+												} ) }
+											</div>
+										</>
+									)
+								}
+							</>
+							}
 							{ step4 ? (
 								<React.Fragment>
 									<button

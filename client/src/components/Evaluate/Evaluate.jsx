@@ -10,7 +10,7 @@ import {
 export default function Evaluate({ star, service, text, staff }) {
   return (
     <div className="container-eval">
-      <div className="evaluate">
+      <div className="evaluate ">
         <div className="text-eval">
           <p>{text}</p>
         </div>
