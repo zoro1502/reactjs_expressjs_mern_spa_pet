@@ -11,6 +11,7 @@ import { MdDeleteOutline, MdOutlineReceiptLong } from "react-icons/md";
 import { Link } from "react-router-dom";
 import ChartAppointment from "../../components/Charts/ChartAppointment";
 import { AuthContext } from "../../context/AuthContext";
+import ModalReceipt from "../../components/Modal/ModalReceipt";
 
 export default function Booking ()
 {
@@ -38,6 +39,7 @@ export default function Booking ()
 	const [ step3, setStep3 ] = useState( false );
 
 	const [ step4, setStep4 ] = useState( false );
+	const [ open, setOpen ] = useState( false );
 
 	const { user } = useContext(AuthContext);
 
@@ -264,23 +266,27 @@ export default function Booking ()
 		);
 	};
 
+	const [dataReceipt, setDataReceipt] = useState(null)
+
 	const CreateReceipt = ( { params } ) =>
 	{
+		
+
 		const handleCreateReceipt = async (
-			data
+			body
 		) =>
 		{
-		console.log( data );
+		console.log( body, user );
 
 
 			try
 			{
-				const res = await axios.post(
-					"http://localhost:8800/api/receipt/add",
-					data
-				);
-				toast.success( "Create receipt successfully" );
-				FetchDataAfterDelete();
+				// const res = await axios.post(
+				// 	"http://localhost:8800/api/receipt/add",
+				// 	data
+				// );
+				// toast.success( "Create receipt successfully" );
+				// FetchDataAfterDelete();
 			} catch ( error )
 			{
 				toast.error( "Create receipt failed" );
@@ -292,21 +298,25 @@ export default function Booking ()
 					className="button-delete"
 					onClick={ () =>
 					{
+						setOpen(true)
+						
 						let data = {
 							Services: params.row?.Services?.split(',')?.map(item => item?.trim()),
 							Discount: 0,
 							Email:  params.row?.Email,
 							Telephone: params.row?.TelephoneCustomer,
 							Name_Customer: params.row?.NameCustomer,
-							Staff_Name: user?.Email
+							Staff_Name: user?.Name
 						}
-						handleCreateReceipt(
-							data
-						);
+						setDataReceipt(data);
+						// handleCreateReceipt(
+						// 	data
+						// );
 					} }
 				>
 					<MdOutlineReceiptLong className="icon-create" />
 				</button>
+				
 			</div>
 		);
 	};
@@ -384,8 +394,11 @@ export default function Booking ()
 		[ rowId ]
 	);
 
+	
+
 	return (
 		<div className="container">
+			<ModalReceipt open={open} onClose={() => setOpen(false)} form={dataReceipt} />
 			<div className="left-container">
 				<Sidebar />
 			</div>
@@ -568,6 +581,7 @@ export default function Booking ()
 					</div>
 				</div>
 			</div>
+			
 		</div>
 	);
 }

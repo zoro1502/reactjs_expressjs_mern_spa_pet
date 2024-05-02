@@ -462,6 +462,7 @@ export const GetAllAppointmentMatchPending = async (req, res) => {
     const appointment = await Appointment.find({
       $and: [{ date: currentDate }, { Status: "pending" }],
     });
+	
     responseType.message = "Get appointment successfully";
     responseType.status = 200;
     responseType.value = appointment;
