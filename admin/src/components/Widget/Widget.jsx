@@ -122,7 +122,7 @@ export default function Widget() {
           />
         }
         amount={revenue}
-        isMoney={"$"}
+        isMoney={"VND"}
       />
       <Items
         title="Customer"

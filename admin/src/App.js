@@ -29,7 +29,6 @@ import ListAppointment from "./pages/appointmentForStaff/ListAppointment";
 
 export default function App() {
   const { user } = useContext(AuthContext);
-	console.log(user);
   return (
     <Router>
       <Routes>
