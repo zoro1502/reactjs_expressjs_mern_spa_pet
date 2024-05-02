@@ -107,7 +107,7 @@ export const GetStaffById = async (req, res) => {
 export const GetStaffs = async (req, res) => {
   const responseType = {};
   if (Staff) {
-    const staff = await Staff.find({ Name: { $ne: "Admin" } });
+    const staff = await Staff.find({ isAdmin : false });
 
     responseType.statusText = "Success";
     responseType.message = "Get customer successfully";
