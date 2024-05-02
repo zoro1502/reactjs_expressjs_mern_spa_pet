@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { MdDriveFileRenameOutline, MdOutlineEmail } from "react-icons/md";
-import { BsTelephoneForward, BsGenderAmbiguous, BsFileEarmarkPerson, BsArrowDown } from "react-icons/bs";
+import { BsTelephoneForward, BsGenderAmbiguous, BsFileEarmarkPerson, BsArrowDown, BsPercent } from "react-icons/bs";
 import { FaRegAddressCard, FaBirthdayCake } from "react-icons/fa";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { toast } from "react-toastify";
@@ -120,7 +120,7 @@ export default function ModalReceipt ( { open, onClose, ...props } )
 							<label style={ { margin: "10px" } }> Discount: </label>
 							<div className="items-value">
 								<span className="icon-value">
-									<BsArrowDown />
+									<BsPercent  />
 								</span>
 								<input
 									type="text"
@@ -131,12 +131,14 @@ export default function ModalReceipt ( { open, onClose, ...props } )
 									onChange={ ( e ) =>
 									{
 										let value = e?.target?.value;
-										if ( value.match( /^[0-9]+$/g ) )
+										
+										if ( value.match( /^[0-9]+\.?([0-9]+)?$/g ) && Number(value) <= 100)
 										{
 											setData( { ...data, Discount: value } )
-										} else
+										} 
+										else
 										{
-											setData( { ...data, Discount: '' } )
+											setData( { ...data, Discount: data.Discount || '' } )
 										}
 									} }
 								/>
